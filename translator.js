@@ -26,17 +26,34 @@ function sheetTranslation() {
   )) throw new Error("The headers must be \"[Source, Target]\"");
 
   const identifiers = new Map(); //Map Label to Identifier that contains our Range
+  let labelToRange = (label, id) => id.sheet.getRange(config.user.STARTING_ROW, label.index, config.user.MAXROWS, 1);
+
+  //For each source and target pair of user selection...
   for ([source, target] of userSelection) {
-    [source, target] = [source,target].map(elem => Label.parse(elem)); //Make source and target into Label Objects
+    //Make source and target into Label Objects
+    [source, target] = [source,target].map(elem => Label.parse(elem)); 
 
+    //Ask user to identify the source and target sheets corresponding to each ID
     for (label of [source, target]) {
-      //Ask user to identify the Identifier to know from where to fetch the data
-      if (!identifiers.get(label)) identifiers.set(label, Identifier.fetchFromUser(label, UI, SS));
+      if (!identifiers.has(label.id)) identifiers.set(label.id, Identifier.fetchFromUser(label, UI, SS));
     }
+    
+    // Grab source and target identifiers
+    let sourceIdentifier = identifiers.get(source.id);
+    let targetIdentifier = identifiers.get(target.id);
 
-    //My dumb code can't reutilize Labels, fix it pls by making a label list..??? 
-
+    try {
+      //Try to get the corresponding columns
+      let sourceRange = labelToRange(source, sourceIdentifier);
+      let targetRange = labelToRange(target, targetIdentifier);
+      //Copies the contents from source to target
+      sourceRange.copyTo(targetRange);
+    } catch (e) {
+      console.error(new Error(`Error copying ${source} to ${target}\n${e}`));
+    }
   }
 }
+
+
 
 
