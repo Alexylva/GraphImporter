@@ -1,5 +1,9 @@
 const config = {
-  constants: {
+  user: {
+    FIRST_ROW: 1,
+    INCLUDE_HEADER: false,
+    HEADER_SIZE: 1,
+    STARTING_ROW: INCLUDE_HEADER ? FIRST_ROW : FIRST_ROW + HEADER_SIZE,
     MAXROWS: 1000
   }
 }
